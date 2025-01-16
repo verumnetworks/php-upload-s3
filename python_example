@@ -1,0 +1,33 @@
+import pyotp
+
+def generate_mfa_secret():
+    """Generates a new MFA secret key."""
+    return pyotp.random_base32()
+
+def generate_provisioning_uri(secret, username, issuer):
+    """Generates a provisioning URI for use with Google Authenticator."""
+    totp = pyotp.TOTP(secret)
+    return totp.provisioning_uri(name=username, issuer_name=issuer)
+
+def verify_totp(secret, code):
+    """Verifies a TOTP code against the given secret."""
+    totp = pyotp.TOTP(secret)
+    return totp.verify(code)
+
+if __name__ == "__main__":
+    # Generate a new MFA secret
+    secret = generate_mfa_secret()
+    print("MFA secret:", secret)
+
+    # Generate a provisioning URI
+    uri = generate_provisioning_uri(secret, "user@example.com", "My App")
+    print("Provisioning URI:", uri)
+
+    # Simulate user input
+    code = input("Enter TOTP code: ")
+
+    # Verify the code
+    if verify_totp(secret, code):
+        print("MFA successful!")
+    else:
+        print("MFA failed.")
